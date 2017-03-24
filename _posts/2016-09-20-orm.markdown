@@ -1,0 +1,109 @@
+---
+layout:     post
+title:      "跟我一起来实现一个ORM"
+subtitle:   " \"Python元类\""
+date:       2016-09-19 18:00:00
+author:     "Xz Yao"
+header-img: "img/post-bg-orm.jpg"
+catalog: true
+tags:
+    - Technology
+    - Engineering
+---
+最近在做Tech Builds的新闻页的时候，用到了很多爬虫方面的技术。虽说在爬虫方面已经有较为完善的Scrapy等框架可供调用，但是还是希望自己从头来完成一个这样的爬虫框架，在使用上希望尽可能简单。
+
+恰好之前有个同学刚刚也在写一个爬虫，问到我怎么写模型比较好，那个时候我都是用SQLAlchemy来实现ORM的。这次也找机会自己实现一个，算是填上了当初数据库作业的坑。
+
+我们要实现的大概是这样的一个功能，当我们编写如下的代码：
+
+```
+class Article(Model):
+    link=Column('link')
+    title=Column('title')
+    source=Column('source')
+    keyword=Column('keyword')
+    def __init__(self):
+        pass
+
+    def setProps(self,link,title,source,keyword):
+        self.link=link
+        self.title=title
+        self.source=source
+        self.keyword=keyword
+
+    def add(self):
+        try:
+            self.save()
+        except Exception,e:
+            print str(e)
+```
+
+之后，当我们需要将其保存在数据库的时候，直接调用save/add方法就好了，可以直接将其存在数据库或是一些BaaS服务中（例如我的爬虫是存在了LeanCloud），这实际上是完成了一次由类的属性到数据库中列的映射，类的每一个对象都可以映射为数据中的一行数据。这是一个挺有趣的功能，虽然可能带来一些性能上的损失，但可以大大简化开发的流程，比如我们就不需要再拼接SQL字符串了。之前写数据库作业就想要自己实现一个小型的ORM，这次终于找到了机会。
+
+ORM是一个比较典型的元类应用，元类是Python中比较高级的一种用法，但理解它是相当容易的。我们知道，世间万物无一不是对象，世间万物的类别就都是类。那么类是一个类吗？当然！```Everything is Object```，类也在Everything这个全集中。那么类的类(the Class of Class)就是顾名思义的元类(Metaclass)了。
+
+当我们创建一个对象时，例如上文中的Article这个类，Python的解释器会首先在当前类的定义中寻找是否存在元类的定义，如果没有，就继续在它继承的父类中寻找元类的定义。如果有，就使用元类来定义这个类。换句话说，元类中的一些方法被继承到了子类中，而子类并不知道这件事。用户在这个时候只需要继承Model就可以了，也不需要关心具体的实现。所以我们就考虑在Model中，定义它的元类。出于习惯，我们将元类的名称以```MetaClass```来命名。
+
+```
+class Model(dict):
+    __metaclass__ = ModelMetaClass
+    def __init__(self, **kw):
+        super(Model, self).__init__(**kw)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError('Attribute '+key+' Not Found')
+
+    def __setattr__(self, key, value):
+        self[key] = value
+        
+    # Overwrite this method to support Database etc.
+    def save(self):
+        LeanObj=leancloud.Object.extend(self.__table__)
+        lo=LeanObj()
+        for k, v in self.__mappings__.items():
+            lo.set(k,self[k])
+        try:
+            lo.save()
+        except Exception,e:
+            print 'Save to Leancloud Failed.'
+            print str(e)
+            raise ValueError('Save to Leancloud Failed.')
+```
+在这个类中，我们定义了它的元类为ModelMetaClass, 并定义```save()```方法，在save方法中可以实现保存的功能。更为关键的是，我们在这里存在一个```self.mappings```中，它就是继承自metaclass的属性。我们再来看看metaclass.
+
+```
+class ModelMetaClass(type):
+    def __new__(cls,name,bases,attrs):
+        if __name__=='Model':
+            return type.__new__(cls,name,bases,attrs)
+        print('Found model: %s' % name)
+        mappings = dict()
+        for k, v in attrs.items():
+            if isinstance(v,Field):
+                print('Found mapping: %s ==> %s' % (k, v))
+                mappings[k]=v
+        for k in mappings.keys():
+            attrs.pop(k)
+        attrs['__mappings__'] = mappings
+        attrs['__table__'] = name
+        return type.__new__(cls, name, bases, attrs)
+```
+![MetaClass](http://i.stack.imgur.com/QQ0OK.png)
+在metaclass中，我们主要做了四件事：
+1.如果是Model类，就不做任何操作直接返回。
+2.寻找映射关系。在attrs中做遍历。遍历到的key是属性的名字，v是Field的对象。如果v是Field的实例，就将这一对Key-Value加入映射字典中。
+3.从attrs中移除属性的名字，避免子类覆盖。
+4.将mappings和表名加入attrs中。
+
+这里的__new__是在创建对象时就会被调用的，因此在创建一个User类时，就会调用```__new__```方法来找到这个映射关系。之后才会是Model和User类中```__init__```方法。
+
+这样，当我们继承一个Model类的时候，只需要在这个新的类中调用save方法，就可以直接将其存储到Leancloud上了。虽然这个例子有点多余（因为Leancloud本身就可以完成这样的功能），但在为其补充如MySQL、Oracle等数据库的驱动支持之后，就可以支持多种数据库，避免编写SQL代码了。在原理上也是比较容易的。
+
+谨记，```Everything is Object. I mean EVERYTHING.```
+
+### Reference 
+
+1. [廖雪峰的博客](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014319106919344c4ef8b1e04c48778bb45796e0335839000)

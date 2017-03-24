@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <script src="http://7i7hnf.com1.z0.glb.clouddn.com/Must.js"></script>
+        <script src="http://7i7hnf.com1.z0.glb.clouddn.com/my.js"></script>
+        <script src="http://7i7hnf.com1.z0.glb.clouddn.com/jquery.min.js"></script>
+        <title>TBD News</title>
+    </head>
+    <body>
+        <div class="header" align='center'>
+            <h1>Tech Builds Developer News</h1>
+            <h2>Download our Apps to get personlized daily news!</h2>
+        </div>
+        <div align='center'>
+            <script id="template" type="x-tmpl-mustache">
+                <table class="pure-table">
+                <thead>
+                    <tr>
+                        <th>题目</th>
+                        <th>关键字</th>
+                        <th>更新时间</th>
+                    </tr>
+                </thead>
+                {{#results}}
+                    <tbody>
+                        <tr>
+                            <td><a href={{link}} target="view_window">{{title}}</a></td>
+                            <td>{{keyword}}</td>
+                            <td>{{updatedAt}}</td>
+                        </tr>
+                    </tbody>
+                {{/results}}
+                 </table>
+                 <br>
+            </script>
+                <div id='target'>
+                    点击按钮开始
+                </div>
+        </div>
+        <div align='center'>
+            <button class="pure-button" onclick="getPosts(loadArticle)">下一页</button>
+        </div>
+        <div align='right'>
+            Updated at 2016-8-8 10:01:16
+        </div>
+    </body>
+    <footer>
+        <script>
+            function loadArticle(results){
+                var template = $('#template').html();
+                Mustache.parse(template);
+                var rendered = Mustache.render(template, results);
+                $('#target').html(rendered);
+            }
+            $(document).ready(function() {
+                localStorage.removeItem("cursor");
+                console.log('Ready!');
+            });
+        </script>
+    </footer>
+</html>

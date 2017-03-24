@@ -1,75 +1,109 @@
-url: https://zhitantech.github.io
-baseurl: 
-
 # Site settings
-title: 完美会议
-email: contact@zhitan.tech
-description: "We are Zhitan.tech, We talk Tech Only."
+title: Tech Builds
+SEOTitle: TechBuilds | Xz's Blog
+header-img: img/home-bg.jpg
+email: i@askfermi.me
+description: "只是一个写字的地方，欢迎关注"
+keyword: "机器学习,Machine Learning,模式识别,Pattern Recognition,姚晓哲"
+url: "http://stevefermi.github.io"              # your host, for absolute URL
+baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
 
-# Team names, titles and social links
-people:
-- name: Xiaozhe Yao
-  pic: 1
-  position: Lead Developer
-  social:
-    - title: weibo
-      url: http://weibo.com/askfermi?is_all=1
-    - title: facebook
-      url: #
-    - title: stack-overflow
-      url: #
 
-- name: Yao Gong
-  pic: 2
-  position: Lead Marketer
-  social:
-    - title: twitter
-      url: #
-    - title: facebook
-      url: #
-    - title: linkedin
-      url: #
+# SNS settings
+RSS: false
+weibo_username:     askfermi
+zhihu_username:     askfermi
+github_username:    stevefermi
+#twitter_username:  huxpro
+facebook_username:  askfermi
+# linkedin_username:  firstname-lastname-idxxxx
 
-- name: Fongyee Chuen
-  pic: 3
-  position: Lead Operation
-  social:
-    - title: weibo
-      url: #
-    - title: facebook
-      url: #
-    - title: google-plus
-      url: #
-- name: Jenna Zhang
-  pic: 4
-  position: Developer
-  social:
-    - title: twitter
-      url: #
-    - title: facebook
-      url: #
-    - title: google-plus
-      url: #
 
-# Social networks usernames (many more available: google-plus, flickr, dribbble, pinterest, instagram, tumblr, linkedin, etc.)
-social:
-  - title: twitter
-    url: http://twitter.com/jekyllrb
-  - title: facebook
-    url:
-  - title: stack-overflow
-    url: http://stackoverflow.com/questions/tagged/jekyll
-  - title: bitbucket 
-    url: http://bitbucket.org/jekyll
-  - title: github
-    url: http://github.com/jekyll
-
-# Postal address (add as many lines as necessary)
-address:
-  - line: 3481 Melrose Place
-  - line: Beverly Hills, CA 90210
 
 # Build settings
-markdown: kramdown
+# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
+highlighter: rouge
 permalink: pretty
+paginate: 10
+exclude: ["less","node_modules","Gruntfile.js","package.json","README.md","README.zh.md"]
+anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
+
+
+
+# Gems
+# from PR#40, to support local preview for Jekyll 3.0
+gems: [jekyll-paginate]
+
+
+
+# Markdown settings
+# replace redcarpet to kramdown,
+# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
+# document: http://jekyllrb.com/docs/configuration/#kramdown
+markdown: kramdown
+kramdown:
+  input: GFM                            # use Github Flavored Markdown !important
+
+
+
+# Disqus settings
+#disqus_username: _your_disqus_short_name_
+
+# Duoshuo settings
+duoshuo_username: techbuilds
+# Share component is depend on Comment so we can NOT use share only.
+duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+
+
+
+
+# Analytics settings
+# Baidu Analytics
+ba_track_id: 4cc1f2d8f3067386cc5cdb626a202900
+# Google Analytics
+ga_track_id: 'UA-80207265-1'            # Format: UA-xxxxxx-xx
+ga_domain: blog.askfermi.me
+
+
+
+# Sidebar settings
+sidebar: true                           # whether or not using Sidebar.
+sidebar-about-description: "Wish to live in a world where TECH builds"
+sidebar-avatar: 'http://stevefermi.github.io/img/avatar-xz.jpg'      # use absolute URL, seeing it's used in both `/` and `/about/`
+
+
+
+# Featured Tags
+featured-tags: true                     # whether or not using Feature-Tags
+featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+
+
+
+# Friends
+friends: [
+    {
+        title: "INOG",
+        href: "https://szuinog.github.io/"
+    },
+    {
+        title: "Aiden的博客",
+        href: "http://blog.csdn.net/new_aiden"
+    },
+    {
+        title: "廖荣杰的博客",
+        href: "http://blog.jerryliao.cn"
+    },
+    {
+        title: "TBD News",
+        href: "http://blog.askfermi.me/newsfeed.html"
+    },
+    {
+        title: "只谈科技",
+        href: "https://zhitantech.github.io/"
+    },
+    {
+        title: "INOG BBS",
+        href: "http://bbs.ifevent.com/"
+    },
+]
